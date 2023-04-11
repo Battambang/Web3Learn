@@ -4,7 +4,7 @@ pragma solidity 0.8.19;
 
 contract Counter {
 
-    uint256 count;
+    uint256 public count;
 
     function increment() public returns (uint256) {
         count++;

@@ -3,22 +3,41 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Deploying Counter to Polygon</title>
+    <title>Deploying and using Counter Smart Contract</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 </head>
 
 <body>
+    <div>
+        <p>Wallet address: <span id="wallet_address"></span></p>
+        <p>Counter: <span id="current_counter">0</span></p>
+        <button id="increment_counter">Increment counter</button>
+    </div>
     <script type="text/javascript">
         var account = null;
+        var contract = null;
+        const ABI = '[{"inputs":[],"name":"count","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"increment","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}]';
+        const ADDRESS = '0x8dF08661a76a82743F94f026151b9E5249166861';
+
         (async () => {
             if (window.ethereum) {
+                // Connect wallet
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 window.web3 = new Web3(window.ethereum);
                 var accounts = await web3.eth.getAccounts();
                 account = accounts[0];
+                document.getElementById('wallet_address').textContent = account;
+
+                // Get Smart Contract
+                contract = new web3.eth.Contract(JSON.parse(ABI), ADDRESS);
+                printCounter();
+                document.getElementById('increment_counter').onclick = () => {
+                    incrementCounter();
+                }
             }
         })();
 
+        // Deploy Smart Contract
         const deploy = async (abi, bytecode) => {
             var deployingContract = new web3.eth.Contract(abi).deploy({
                 data: bytecode
@@ -32,6 +51,21 @@
             console.log('Address of contract: ' + deplyedContract.options.address);
 
             return deplyedContract.options.address;
+        }
+
+        const printCounter = async () => {
+            if (contract) {
+                var count = await contract.methods.count().call();
+                console.log('Counter is: ' + count);
+                document.getElementById('current_counter').textContent = count;
+            }
+        }
+
+        const incrementCounter = async () => {
+            if (contract) {
+                var tx = await contract.methods.increment().send({ from: account });
+                window.location.reload();
+            }
         }
     </script>
 </body>
