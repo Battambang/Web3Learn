@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Deploying Counter to Polygon</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        var account = null;
+        (async () => {
+            if (window.ethereum) {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                window.web3 = new Web3(window.ethereum);
+                var accounts = await web3.eth.getAccounts();
+                account = accounts[0];
+            }
+        })();
+
+        const deploy = async (abi, bytecode) => {
+            var deployingContract = new web3.eth.Contract(abi).deploy({
+                data: bytecode
+            });
+            var estimatedGas = await deployingContract.estimateGas();
+            var deplyedContract = await deployingContract.send({
+                from: account,
+                gas: estimatedGas
+            });
+
+            console.log('Address of contract: ' + deplyedContract.options.address);
+
+            return deplyedContract.options.address;
+        }
+    </script>
+</body>
+
+</html>
