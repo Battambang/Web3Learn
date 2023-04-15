@@ -43,14 +43,14 @@
                 data: bytecode
             });
             var estimatedGas = await deployingContract.estimateGas();
-            var deplyedContract = await deployingContract.send({
+            var deployedContract = await deployingContract.send({
                 from: account,
                 gas: estimatedGas
             });
 
-            console.log('Address of contract: ' + deplyedContract.options.address);
+            console.log('Address of contract: ' + deployedContract.options.address);
 
-            return deplyedContract.options.address;
+            return deployedContract.options.address;
         }
 
         const printCounter = async () => {
